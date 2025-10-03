@@ -40,6 +40,16 @@ public class OrderItem {
 			this.productId = productId;
 			this.quantity = quantity;
 		}
+		
+		
+		@Override
+		public String toString() {
+		    return "OrderItem{id=" + id +
+		           ", productId=" + productId +
+		           ", quantity=" + quantity +
+		           ", price=" + price + "}";
+		}
+
 
 		public Long getId() {
 			return id;

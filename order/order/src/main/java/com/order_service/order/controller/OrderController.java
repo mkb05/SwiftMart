@@ -1,6 +1,7 @@
 package com.order_service.order.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,19 @@ public class OrderController {
 	    public ResponseEntity<Order> createOrder(HttpServletRequest request,
 	    										@RequestBody Order order) {
 		 
+		// Log headers
+		    System.out.println("Authorization: " + request.getHeader("Authorization"));
+		    System.out.println("Content-Type: " + request.getHeader("Content-Type"));
+
+		    
+		    System.out.println("Incoming order: " + order);
+
+		 
+		 
 		 Long userId=(Long) request.getAttribute("userId");
+		 
+		 
+		 
 		 if(userId==null) {
 			 return ResponseEntity.status(401).build();
 		 }

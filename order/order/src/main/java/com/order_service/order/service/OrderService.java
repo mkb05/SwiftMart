@@ -5,7 +5,10 @@ import java.util.List;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.common.dto.OrderEvent;
+import com.example.common.dto.OrderItemEvent;
 import com.order_service.order.Entity.Order;
 import com.order_service.order.Entity.OrderItem;
 import com.order_service.order.Repository.OrderRepository;
@@ -14,9 +17,9 @@ import com.order_service.order.Repository.OrderRepository;
 public class OrderService {
 
 	private final OrderRepository orderRepository;
-	private final KafkaTemplate<String,Order> kafkaTemplate;
+	private final KafkaTemplate<String,OrderEvent> kafkaTemplate;
 
-	public OrderService(OrderRepository orderRepository,KafkaTemplate<String,Order> kafkaTemplate) {
+	public OrderService(OrderRepository orderRepository,KafkaTemplate<String, OrderEvent> kafkaTemplate) {
 		super();
 		this.orderRepository = orderRepository;
 		this.kafkaTemplate = kafkaTemplate;
@@ -36,13 +39,13 @@ public class OrderService {
         Order savedOrder= orderRepository.save(order);
         
         //Produce event
-        Order event=new Order(
+        OrderEvent event=new OrderEvent(
         		savedOrder.getId(),
         		savedOrder.getUserId(),
         		savedOrder.getStatus(),
         		savedOrder.getTotalPrice(),
         		savedOrder.getItems().stream()
-        					.map(i -> new OrderItem(i.getProductId(),i.getQuantity()))
+        					.map(i -> new OrderItemEvent(i.getProductId(),i.getQuantity()))
         					.toList()
         		);
         	kafkaTemplate.send("order-events",event);
@@ -50,8 +53,10 @@ public class OrderService {
         	return savedOrder;
     }
 	
+	@Transactional
 	@KafkaListener(topics="inventory-events",groupId="order-service")
-	public void handleInventoryUpdate(Order event) {
+	public void handleInventoryUpdate(OrderEvent event) {
+		System.out.print("Kafka event response"+event);
 		Order order=orderRepository.findById(event.getId())
 				.orElseThrow(() -> new RuntimeException("Order not found"));
 		

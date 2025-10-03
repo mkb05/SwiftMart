@@ -29,12 +29,16 @@ public class JwtAuthFilter extends OncePerRequestFilter  {
 			if(authHeader !=null && authHeader.startsWith("Bearer ")) {
 				String token=authHeader.substring(7);
 				
-				Claims claims=Jwts.parser()
+				Claims claims=Jwts.parserBuilder()
 						.setSigningKey(secret.getBytes())
+						.build()
 						.parseClaimsJws(token)
 						.getBody();
 				
-				String userId=claims.get("userId",String.class);
+				String userIdStr=claims.getSubject();
+				Long userId=Long.parseLong(userIdStr);
+				
+		
 				
 				//  Created Authentication and set it
 				UsernamePasswordAuthenticationToken authentication =
