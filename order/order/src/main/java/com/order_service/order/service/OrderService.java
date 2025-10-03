@@ -2,6 +2,8 @@ package com.order_service.order.service;
 
 import java.util.List;
 
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.order_service.order.Entity.Order;
@@ -12,10 +14,12 @@ import com.order_service.order.Repository.OrderRepository;
 public class OrderService {
 
 	private final OrderRepository orderRepository;
+	private final KafkaTemplate<String,Order> kafkaTemplate;
 
-	public OrderService(OrderRepository orderRepository) {
+	public OrderService(OrderRepository orderRepository,KafkaTemplate<String,Order> kafkaTemplate) {
 		super();
 		this.orderRepository = orderRepository;
+		this.kafkaTemplate = kafkaTemplate;
 	}
 	
 	public Order createOrder(Order order) {
@@ -29,8 +33,37 @@ public class OrderService {
         }
         order.setTotalPrice(total);
 
-        return orderRepository.save(order);
+        Order savedOrder= orderRepository.save(order);
+        
+        //Produce event
+        Order event=new Order(
+        		savedOrder.getId(),
+        		savedOrder.getUserId(),
+        		savedOrder.getStatus(),
+        		savedOrder.getTotalPrice(),
+        		savedOrder.getItems().stream()
+        					.map(i -> new OrderItem(i.getProductId(),i.getQuantity()))
+        					.toList()
+        		);
+        	kafkaTemplate.send("order-events",event);
+        	
+        	return savedOrder;
     }
+	
+	@KafkaListener(topics="inventory-events",groupId="order-service")
+	public void handleInventoryUpdate(Order event) {
+		Order order=orderRepository.findById(event.getId())
+				.orElseThrow(() -> new RuntimeException("Order not found"));
+		
+		if("INVENTORY_CONFIRMED".equals(event.getStatus())) {
+			order.setStatus("CONFIRMED");
+		}else if("INVENTORY_FAILED".equals(event.getStatus())){
+			order.setStatus("CANCELED");
+		}
+		
+		orderRepository.save(order);
+	}
+	
 	
 	 public Order getOrder(Long id) {
 	        return orderRepository.findById(id)

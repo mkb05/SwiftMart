@@ -1,10 +1,15 @@
 package com.order_service.order.jwtutil;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Collections;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,10 +34,17 @@ public class JwtAuthFilter extends OncePerRequestFilter  {
 						.parseClaimsJws(token)
 						.getBody();
 				
-				Long userId=claims.get("userId",Long.class);	
+				String userId=claims.get("userId",String.class);
+				
+				//  Created Authentication and set it
+				UsernamePasswordAuthenticationToken authentication =
+				        new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+				
+				SecurityContextHolder.getContext().setAuthentication(authentication);
 				
 				request.setAttribute("userId", userId);
 			}
+			filterChain.doFilter(request, response);
 		}
 			catch(Exception e) {
 				throw new RuntimeException("Invalid JWT Token");

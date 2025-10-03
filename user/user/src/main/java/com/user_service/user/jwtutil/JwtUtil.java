@@ -22,9 +22,9 @@ public class JwtUtil {
 	}
 	
 	
-	public String generateToken(String email) {
+	public String generateToken(String userId) {
 		return Jwts.builder()
-				.setSubject(email)
+				.setSubject(userId)
 				.setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis()+EXPIRATION))
 				.signWith(getSigningKey(),SignatureAlgorithm.HS256)

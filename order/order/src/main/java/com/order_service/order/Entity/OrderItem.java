@@ -1,5 +1,7 @@
 package com.order_service.order.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,7 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="ecommerce_orders")
+@Table(name="orders_items")
 public class OrderItem {
 
 	 @Id
@@ -24,7 +26,20 @@ public class OrderItem {
 	    
 	    @ManyToOne
 	    @JoinColumn(name="order_id")
+	    @JsonBackReference
 	    private Order order;
+	    
+	    
+
+		public OrderItem() {
+			super();
+		}
+
+		public OrderItem(Long productId, Integer quantity) {
+			super();
+			this.productId = productId;
+			this.quantity = quantity;
+		}
 
 		public Long getId() {
 			return id;

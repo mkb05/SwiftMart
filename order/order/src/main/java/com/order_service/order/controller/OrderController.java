@@ -15,11 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.order_service.order.Entity.Order;
 import com.order_service.order.service.OrderService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("api/orders")
 public class OrderController {
 
 	private final OrderService service;
+	
+	
 
 	public OrderController(OrderService service) {
 		super();
@@ -27,25 +31,47 @@ public class OrderController {
 	}
 	
 	 @PostMapping
-	    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+	    public ResponseEntity<Order> createOrder(HttpServletRequest request,
+	    										@RequestBody Order order) {
+		 
+		 Long userId=(Long) request.getAttribute("userId");
+		 if(userId==null) {
+			 return ResponseEntity.status(401).build();
+		 }
+		 
+		 order.setUserId(userId);
+		 
 	        return ResponseEntity.ok(service.createOrder(order));
 	    }
 
 	    @GetMapping("/{id}")
-	    public ResponseEntity<Order> getOrder(@PathVariable Long id) {
+	    public ResponseEntity<Order> getOrder(HttpServletRequest request, @PathVariable Long id) {
+	    	
+	    	Long userId = (Long) request.getAttribute("userId");
+	        if (userId == null) {
+	            return ResponseEntity.status(401).build();
+	        }
+	        
 	        return ResponseEntity.ok(service.getOrder(id));
 	    }
 
 	    @GetMapping
-	    public ResponseEntity<List<Order>> getOrdersByUser(@RequestParam(required = false) Long userId) {
-	        if (userId != null) {
+	    public ResponseEntity<List<Order>> getOrdersByUser(HttpServletRequest request, @RequestParam(required = false) Long userId) {
+	       
+	    	if (userId != null) {
 	            return ResponseEntity.ok(service.getOrdersByUser(userId));
 	        }
 	        return ResponseEntity.ok(service.getAllOrders());
 	    }
 
 	    @PutMapping("/{id}/cancel")
-	    public ResponseEntity<Order> cancelOrder(@PathVariable Long id) {
+	    public ResponseEntity<Order> cancelOrder(HttpServletRequest request, @PathVariable Long id) {
+	    	
+	    	 Long userId = (Long) request.getAttribute("userId");
+	         if (userId == null) {
+	             return ResponseEntity.status(401).build();
+	         }
+	    	
 	        return ResponseEntity.ok(service.cancelOrder(id));
 	    }
 }
