@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.common.dto.OrderEvent;
 import com.example.common.dto.OrderItemEvent;
+import com.example.common.dto.PaymentEvent;
 import com.order_service.order.Entity.Order;
 import com.order_service.order.Entity.OrderItem;
 import com.order_service.order.Repository.OrderRepository;
@@ -48,7 +49,9 @@ public class OrderService {
         					.map(i -> new OrderItemEvent(i.getProductId(),i.getQuantity()))
         					.toList()
         		);
-        	kafkaTemplate.send("order-events",event);
+        	kafkaTemplate.send("order-events-inventory",event);
+        	
+        	
         	
         	return savedOrder;
     }
@@ -61,12 +64,42 @@ public class OrderService {
 				.orElseThrow(() -> new RuntimeException("Order not found"));
 		
 		if("INVENTORY_CONFIRMED".equals(event.getStatus())) {
-			order.setStatus("CONFIRMED");
+			
+			
+			 OrderEvent Confirmedevent=new OrderEvent(
+					 event.getId(),
+					 event.getUserId(),
+					 event.getStatus(),
+					 event.getTotalPrice(),
+					 event.getItems().stream()
+		        					.map(i -> new OrderItemEvent(i.getProductId(),i.getQuantity()))
+		        					.toList()
+		        		);
+			 
+			 kafkaTemplate.send("order-events-payment",Confirmedevent);
+			
 		}else if("INVENTORY_FAILED".equals(event.getStatus())){
 			order.setStatus("CANCELED");
 		}
 		
 		orderRepository.save(order);
+	}
+	
+	@Transactional
+	@KafkaListener(topics="payment-events",groupId="order-service")
+	public void handlePaymentUpdate(PaymentEvent event) {
+		System.out.print("Kakfa payment response "+event);
+		Order order=orderRepository.findById(event.getOrderId())
+				.orElseThrow(() -> new RuntimeException("Order not found"));
+		
+		if("SUCCESS".equals(event.getPaymentStatus())) {
+			order.setStatus("ORDER PLACED");
+		}else if("FAILED".equals(event.getPaymentStatus())) {
+			order.setStatus("PAYMENT FAILED");
+		}
+		
+		orderRepository.save(order);
+		
 	}
 	
 	
