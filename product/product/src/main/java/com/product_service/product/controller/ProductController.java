@@ -19,7 +19,6 @@ import com.product_service.product.service.ProductService;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "http://localhost:4200")
 public class ProductController {
 
 	private final ProductService productService;
