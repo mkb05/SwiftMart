@@ -2,6 +2,7 @@ package com.product_service.product.service;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.product_service.product.Entity.Product;
@@ -11,10 +12,12 @@ import com.product_service.product.repository.ProductRepository;
 public class ProductService {
 
 	private final ProductRepository productRepository;
+	private ProductPopularityService productPopularityService;
 
-	public ProductService(ProductRepository productRepository) {
+	public ProductService(ProductRepository productRepository,ProductPopularityService productPopularityService) {
 		super();
 		this.productRepository = productRepository;
+		this.productPopularityService=productPopularityService;
 	}
 	
 	
@@ -39,8 +42,14 @@ public class ProductService {
 	}
 	
 	public Product getProduct(Long id) {
-		return productRepository.findById(id)
+		
+		
+		Product product= productRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Product not found"));
+		
+		productPopularityService.recordView(id.toString()); //Redis Update
+		
+		return product;
 	}
 	
 	public List<Product> getAllProducts(){
