@@ -1,1 +1,23 @@
-<router-outlet />
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand">Navbar</a>
+
+    <div class="d-flex gap-3">
+      <div class="d-flex gap-3">
+        <input
+          class="form-control me-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+        />
+        <button class="btn btn-outline-success" type="button">Search</button>
+      </div>
+
+      <button class="btn btn-outline-success" routerLink="/cart" type="button">
+        Cart
+      </button>
+    </div>
+  </div>
+</nav>
+
+<router-outlet></router-outlet>
