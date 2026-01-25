@@ -3,7 +3,6 @@ package com.product_service.product.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.product_service.product.Entity.Product;
+import com.product_service.product.service.ProductPopularityService;
 import com.product_service.product.service.ProductService;
 
 @RestController
@@ -22,10 +22,12 @@ import com.product_service.product.service.ProductService;
 public class ProductController {
 
 	private final ProductService productService;
+	private final ProductPopularityService productPopularityService;
 
-	public ProductController(ProductService productService) {
+	public ProductController(ProductService productService, ProductPopularityService productPopularityService) {
 		super();
 		this.productService = productService;
+		this.productPopularityService=productPopularityService;
 	}
 		
 	@PostMapping
@@ -52,6 +54,11 @@ public class ProductController {
 	 @GetMapping
 	 public ResponseEntity<List<Product>> getAllProducts() {
 	        return ResponseEntity.ok(productService.getAllProducts());
+	 }
+	 
+	 @GetMapping("/topDaily")
+	 public ResponseEntity<List<Product>> getTopDailyProducts(){
+		 return ResponseEntity.ok(productService.getTopDaily());
 	 }
 	 
 	 @GetMapping("/search")

@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ProductPopularityService {
 
 	private static final String DAILY_KEY="popular:products:daily";

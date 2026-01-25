@@ -56,6 +56,21 @@ public class ProductService {
 		return productRepository.findAll();
 	}
 	
+	public List<Product> getTopDaily(){
+		List<String> productIds=productPopularityService.getTopDaily(2);
+		 
+		 if(productIds.isEmpty())
+			 return List.of();
+		 
+		 List<Long> ids=productIds.stream()
+				 .map(Long::valueOf)
+				 .toList();
+		 
+		 return productRepository.findAllById(ids);
+		 
+		 
+	}
+	
 	public List<Product> searchByName(String name){
 		return productRepository.findByNameContainingIgnoreCase(name);
 	}
