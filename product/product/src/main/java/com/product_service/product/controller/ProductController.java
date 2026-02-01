@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.product_service.product.Entity.Product;
+import com.product_service.product.search.Doc.Document.ProductSearchDocument;
 import com.product_service.product.service.ProductPopularityService;
+import com.product_service.product.service.ProductSearchService;
 import com.product_service.product.service.ProductService;
 
 @RestController
@@ -23,11 +25,13 @@ public class ProductController {
 
 	private final ProductService productService;
 	private final ProductPopularityService productPopularityService;
+	private final ProductSearchService productSearchService;
 
-	public ProductController(ProductService productService, ProductPopularityService productPopularityService) {
+	public ProductController(ProductService productService, ProductPopularityService productPopularityService,ProductSearchService productSearchService) {
 		super();
 		this.productService = productService;
 		this.productPopularityService=productPopularityService;
+		this.productSearchService=productSearchService;
 	}
 		
 	@PostMapping
@@ -62,15 +66,15 @@ public class ProductController {
 	 }
 	 
 	 @GetMapping("/search")
-	 public ResponseEntity<List<Product>> searchProducts(@RequestParam(required=false) String name, @RequestParam(required=false) String category){
+	 public ResponseEntity<List<ProductSearchDocument>> searchProducts(@RequestParam(required=false) String name, @RequestParam(required=false) String category){
 		 
 		 if(name!=null) {
-			 return ResponseEntity.ok(productService.searchByName(name));
+			 return ResponseEntity.ok(productSearchService.searchByName(name));
 		 }else if(category!=null) {
-			 return ResponseEntity.ok(productService.searchByCategory(category));
+			 return ResponseEntity.ok(productSearchService.searchByCategory(category));
 		 }
 		 
-		 return ResponseEntity.ok(productService.getAllProducts());
+		 return ResponseEntity.ok(productSearchService.getAllProducts());
 	 }
 	
 }

@@ -1,4 +1,4 @@
-package com.product_service.product.search.Document;
+package com.product_service.product.search.Doc.Document;
 
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -12,10 +12,10 @@ public class ProductSearchDocument {
 	@Id
 	private Long id;
 	
-	@Field(type=FieldType.Text)
+	@Field(type=FieldType.Text,analyzer = "standard")
 	private String name;
 	
-	@Field(type=FieldType.Text)
+	@Field(type=FieldType.Text,analyzer = "standard")
 	private String description;
 	
 	@Field(type=FieldType.Keyword)

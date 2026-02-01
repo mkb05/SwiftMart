@@ -14,12 +14,15 @@ public class ProductService {
 	private final ProductRepository productRepository;
 	private ProductPopularityService productPopularityService;
 	private final KafkaTemplate<String, Object> kafkaTemplate;
+	private ProductSearchService productSearchService;
 
-	public ProductService(ProductRepository productRepository,ProductPopularityService productPopularityService,KafkaTemplate kafkaTemplate) {
+	public ProductService(ProductRepository productRepository,ProductPopularityService productPopularityService,KafkaTemplate kafkaTemplate,
+			ProductSearchService productSearchService) {
 		super();
 		this.productRepository = productRepository;
 		this.productPopularityService=productPopularityService;
 		this.kafkaTemplate=kafkaTemplate;
+		this.productSearchService=productSearchService;
 	}
 	
 	
@@ -46,6 +49,8 @@ public class ProductService {
 	
 	public void deleteProduct(Long id) {
 		productRepository.deleteById(id);
+		
+		productSearchService.deleteById(id);
 	}
 	
 	public Product getProduct(Long id) {
