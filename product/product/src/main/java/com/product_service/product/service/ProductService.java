@@ -2,7 +2,7 @@ package com.product_service.product.service;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.product_service.product.Entity.Product;
@@ -13,16 +13,23 @@ public class ProductService {
 
 	private final ProductRepository productRepository;
 	private ProductPopularityService productPopularityService;
+	private final KafkaTemplate<String, Object> kafkaTemplate;
 
-	public ProductService(ProductRepository productRepository,ProductPopularityService productPopularityService) {
+	public ProductService(ProductRepository productRepository,ProductPopularityService productPopularityService,KafkaTemplate kafkaTemplate) {
 		super();
 		this.productRepository = productRepository;
 		this.productPopularityService=productPopularityService;
+		this.kafkaTemplate=kafkaTemplate;
 	}
 	
 	
 	public Product createProduct(Product product) {
-		return productRepository.save(product);
+		
+		Product saved=productRepository.save(product);
+		
+		kafkaTemplate.send("product-created", saved);
+		
+		return saved;
 	}
 	
 	public Product updateProduct(Long id,Product product) {
