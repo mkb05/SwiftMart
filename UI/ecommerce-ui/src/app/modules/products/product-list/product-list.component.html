@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="m-4 mt-4">
   <h2>Available Products</h2>
   <a routerLink="/cart">TEST CART LINK</a>
 
@@ -8,7 +8,10 @@
     <p>No products available.</p>
   </div>
 
-  <div class="products-row d-flex" *ngIf="!isLoading && products.length">
+  <div
+    class="products-row d-flex overflow-x-auto"
+    *ngIf="!isLoading && products.length"
+  >
     <div
       class="col-md-3 d-flex flex-column"
       *ngFor="let p of products"
