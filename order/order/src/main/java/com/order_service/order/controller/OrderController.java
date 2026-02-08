@@ -19,7 +19,7 @@ import com.order_service.order.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("api/orders")
+@RequestMapping("api/order-cart/orders")
 public class OrderController {
 
 	private final OrderService service;
@@ -56,6 +56,8 @@ public class OrderController {
 		 
 	        return ResponseEntity.ok(service.createOrder(order));
 	    }
+	 
+	 
 
 	    @GetMapping("/{id}")
 	    public ResponseEntity<Order> getOrder(HttpServletRequest request, @PathVariable Long id) {

@@ -4,6 +4,7 @@ import { Router, Route, ActivatedRoute } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { NgIf } from '@angular/common';
 import { CommonModule } from '@angular/common';
+import { CartServiceService } from '../../cart/services/cart-service.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -19,6 +20,7 @@ export class ProductDetailComponent {
     private route: ActivatedRoute,
     private http: HttpClient,
     private productService: ProductService,
+    private cartService: CartServiceService,
   ) {}
 
   ngOnInit(): void {
@@ -33,6 +35,19 @@ export class ProductDetailComponent {
         console.error('Failed to load products', err);
         this.isLoading = false;
       },
+    });
+  }
+
+  addToCart() {
+    const payload = {
+      productId: this.product.id,
+      quantity: 1,
+      price: this.product.price,
+    };
+
+    this.cartService.addToCart(payload).subscribe({
+      next: () => alert('Added to cart'),
+      error: () => alert('Failed to add'),
     });
   }
 }

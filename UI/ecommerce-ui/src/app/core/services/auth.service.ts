@@ -19,6 +19,15 @@ export class AuthService {
     return this.http.post(`${this.baseUrl}/login`, data);
   }
 
+  getUserId(): number | null {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.userId;
+    }
+    return null;
+  }
+
   saveToken(token: string) {
     localStorage.setItem('token', token);
   }
